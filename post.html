@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#4a2196">
+<title>Proud to Post · DSK Math Arena</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0}html{background:#3b1a7c}body{min-height:100vh}
+  body{font:17px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#fff;background:linear-gradient(135deg,#7a45c9 0%,#5d2fae 40%,#4a2196 72%,#3b1a7c 100%);background-attachment:fixed;-webkit-text-size-adjust:100%}
+  main{max-width:640px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 16px 40px;display:flex;flex-direction:column;gap:16px}
+  .brand{font-size:13px;font-weight:700;opacity:.85;letter-spacing:.04em}
+  .head{display:flex;align-items:center;gap:14px}
+  .icon{position:relative;flex:none;width:64px;height:64px;border-radius:16px;background:#5b2d87;display:grid;place-items:center;box-shadow:0 4px 12px #0004}
+  .icon b{width:44px;height:44px;border-radius:50%;background:#fff;color:#4a2470;display:grid;place-items:center;font:800 14px/1 inherit;text-align:center}
+  .icon i{position:absolute;width:9px;height:9px;border-radius:50%;background:#f2c94c}.icon i:nth-child(1){top:7px;left:7px}.icon i:nth-child(2){top:7px;right:7px}.icon i:nth-child(3){bottom:7px;left:7px}.icon i:nth-child(4){bottom:7px;right:7px}
+  h1{margin:0;font-size:27px;line-height:1.15}
+  .sub{font-size:14px;opacity:.85}
+  .card{background:#fff;color:#1d1428;border-radius:18px;padding:18px;box-shadow:0 10px 30px #0003}
+  .card h2{margin:0 0 10px;font-size:20px;color:#4a2470}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cols button{font:600 14.5px inherit;text-align:left;border:2px solid #e3dbf2;background:#f7f3fd;color:#2a1450;border-radius:12px;padding:10px 12px;min-height:52px;cursor:pointer}
+  .cols button[aria-pressed=true]{border-color:#5b2d87;background:#5b2d87;color:#fff}
+  .go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:16px;background:#eaff4d;color:#2a1450;font:800 21px inherit;padding:18px;text-decoration:none;box-shadow:0 6px 18px #0003}
+  .go[aria-disabled=true]{opacity:.45;pointer-events:none}
+  ol{margin:0;padding-left:22px}ol li{margin:6px 0}
+  .name{display:inline-block;background:#f2edfa;border-radius:8px;padding:1px 8px;font-weight:700;color:#4a2470}
+  .tip{font-size:14px;color:#5a5168}
+  .msg{background:#ffffff1f;border-radius:14px;padding:16px;text-align:center}
+  footer{text-align:center;font-size:12px;opacity:.75}
+</style>
+</head>
+<body>
+<main id="app"><div class="msg">Scan the Proud to Post QR code from your teacher.</div></main>
+<footer>DSK Math Arena · Dubai Schools Al Khawaneej</footer>
+<script>
+(function(){
+  "use strict";
+  var COLS=["Fluency task","Self Assessment","Reflection","Peer Feedback","Differentiated Work","Reasoning and Justifying sample","Collaborative Work","Pre and post assessment","Project and Performance task","Midterm and Quizzes","Literacy and oracy tasks"];
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function dec(h){h=h.replace(/-/g,"+").replace(/_/g,"/");while(h.length%4)h+="=";var b=atob(h),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return JSON.parse(new TextDecoder().decode(u))}
+  var app=document.getElementById("app"),D;
+  try{D=dec(location.hash.slice(1))}catch(e){return}
+  if(!D||!D.c)return;
+  var cols=(D.s&&D.s.length?D.s:COLS),pick=-1,colLinks=D.l||{};
+  document.title=D.c+" Proud to Post";
+  function linkFor(i){return (i>=0&&colLinks[i])||D.u||""}
+  function render(){
+    var url=linkFor(pick);
+    app.innerHTML='<div class="brand">DSK MATH ARENA</div>'+
+      '<div class="head"><span class="icon"><i></i><i></i><i></i><i></i><b>'+esc(D.c)+'</b></span><div><h1>'+esc(D.c)+' Proud to Post</h1><div class="sub">'+esc(D.t||"Mathematics")+' · Post your best work</div></div></div>'+
+      '<section class="card"><h2>1. What are you posting?</h2><div class="cols">'+cols.map(function(c,i){return '<button type="button" data-i="'+i+'" aria-pressed="'+(i===pick)+'">'+esc(c)+'</button>'}).join("")+'</div></section>'+
+      '<section class="card"><h2>2. Post your photo</h2><ol>'+
+        '<li>Take a clear photo of your work.</li>'+
+        '<li>Press <b>Post my work</b>, then choose your photo.</li>'+
+        '<li>Write your name: <span class="name">'+esc(D.c)+' · your full name'+(pick>=0?' · '+esc(cols[pick]):'')+'</span></li></ol>'+
+        '<p class="tip">Your work appears on the '+esc(D.c)+' Proud to Post board for your teacher to share.</p></section>'+
+      (url?'<a class="go" href="'+esc(url)+'" '+(pick<0?'aria-disabled="true"':'')+' rel="noopener">📷 Post my work</a>'+(pick<0?'<div class="sub" style="text-align:center">Choose what you are posting first.</div>':''):'<div class="msg">Your teacher has not added the upload link yet.</div>');
+  }
+  app.addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(!b)return;pick=+b.dataset.i;render()});
+  render();
+})();
+</script>
+</body>
+</html>
