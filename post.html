@@ -54,9 +54,14 @@
       '<section class="card"><h2>1. What are you posting?</h2><div class="cols">'+cols.map(function(c,i){return '<button type="button" data-i="'+i+'" aria-pressed="'+(i===pick)+'">'+esc(c)+'</button>'}).join("")+'</div></section>'+
       '<section class="card"><h2>2. Post your photo</h2><ol>'+
         '<li>Take a clear photo of your work.</li>'+
+        (D.f?
+        '<li>Press <b>Post my work</b>. If asked, sign in with your school account.</li>'+
+        '<li>Choose <span class="name">'+(pick>=0?esc(cols[pick]):'the same option')+'</span> again, press <b>Next</b>, add your photo, then press <b>Submit</b>.</li></ol>'+
+        '<p class="tip">Your name is added for you. Only your teacher sees your upload, and it appears on the '+esc(D.c)+' Proud to Post board.</p></section>'
+        :
         '<li>Press <b>Post my work</b>, then choose your photo.</li>'+
         '<li>Write your name: <span class="name">'+esc(D.c)+' · your full name'+(pick>=0?' · '+esc(cols[pick]):'')+'</span></li></ol>'+
-        '<p class="tip">Your work appears on the '+esc(D.c)+' Proud to Post board for your teacher to share.</p></section>'+
+        '<p class="tip">Your work appears on the '+esc(D.c)+' Proud to Post board for your teacher to share.</p></section>')+
       (url?'<a class="go" href="'+esc(url)+'" '+(pick<0?'aria-disabled="true"':'')+' rel="noopener">📷 Post my work</a>'+(pick<0?'<div class="sub" style="text-align:center">Choose what you are posting first.</div>':''):'<div class="msg">Your teacher has not added the upload link yet.</div>');
   }
   app.addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(!b)return;pick=+b.dataset.i;render()});
