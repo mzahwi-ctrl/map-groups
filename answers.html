@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1D2B5C">
+<title>Groups Answers · DSK Math Arena</title>
+<style>
+  :root{--ink:#17202B;--muted:#5A6576;--bg:#F4F5F7;--card:#fff;--line:#E1E4E8;--navy:#1D2B5C;--ok:#1E8E3E;--okb:#E6F4EA;--no:#C62828;--nob:#FDECEA;--gc:#5B2D87;--gb:#F1EAF8;--gf:#fff}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font:17px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+  main{max-width:720px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 90px max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+  .head{background:var(--gc);color:var(--gf);border-radius:16px;padding:14px 18px}
+  .eye{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.9}
+  h1{margin:4px 0 2px;font-size:25px;line-height:1.15}
+  .meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14.5px;opacity:.95}
+  .pill{display:inline-block;background:rgba(255,255,255,.95);color:var(--gc);border-radius:99px;padding:1px 10px;font-weight:800;font-size:13px}
+  .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:15px;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--gc);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .card.ok{border-left-color:var(--ok);background:var(--okb)}.card.no{border-left-color:var(--no);background:var(--nob)}
+  .tt{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;color:var(--muted);font-size:14.5px;text-transform:uppercase;letter-spacing:.04em}
+  .ans{font-size:26px;font-weight:800;color:var(--ink);word-break:break-word}
+  .ans small{display:block;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  button{font:600 15px inherit;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;cursor:pointer;min-height:44px}
+  button.on.y{background:var(--ok);border-color:var(--ok);color:#fff}button.on.n{background:var(--no);border-color:var(--no);color:#fff}
+  .how{display:none;margin:0;padding-left:22px;font-size:16px}.how li{margin:3px 0}.card.open .how{display:block}
+  .score{position:sticky;bottom:max(10px,env(safe-area-inset-bottom));background:var(--navy);color:#fff;border-radius:14px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .score b{font-size:24px}
+  .list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;counter-reset:n}
+  .list li{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--gc);border-radius:12px;padding:10px 14px 10px 46px;position:relative;font-size:17px}
+  .list.num li::before{counter-increment:n;content:counter(n);position:absolute;left:12px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--gc);color:var(--gf);font-weight:800;font-size:13px;display:grid;place-items:center}
+  .list.bul li::before{content:"";position:absolute;left:18px;top:18px;width:10px;height:10px;border-radius:3px;background:var(--gc)}
+  .ar{display:block;direction:rtl;text-align:right;font-size:19px;font-weight:700;color:var(--gc)}
+  .msg{background:var(--card);border-radius:14px;padding:22px;color:var(--muted);text-align:center}
+  footer{color:var(--muted);font-size:12px;text-align:center;padding:8px 0 4px}
+</style>
+</head>
+<body>
+<main id="app"><div class="msg">Scan a QR code on your MAP Intervention paper to see your answers.</div></main>
+<footer>DSK Math Arena · Dubai Schools Al Khawaneej</footer>
+<script>
+(function(){
+  "use strict";
+  var GROUPS=[
+    {k:"Foundations",c:"#D23A30",b:"#FCEDEC",f:"#fff"},
+    {k:"Developing",c:"#C99700",b:"#FEF8E1",f:"#2B1F00"},
+    {k:"Proficient",c:"#2F8A3A",b:"#EAF5EC",f:"#fff"},
+    {k:"Advanced",c:"#3A6FB0",b:"#EAF0F8",f:"#fff"}];
+  var KINDS={A:"Answer Key",E:"ELL Support · English / العربية",S:"Step-by-Step",F:"Formula Sheet"};
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function b64(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";var bin=atob(s),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u}
+
+  /* small raw-DEFLATE decoder (RFC 1951), used when the browser has no DecompressionStream */
+  function inflate(src){
+    var pos=0,bit=0,bitc=0,out=[];
+    function rb(n){var v=0;for(var i=0;i<n;i++){if(!bitc){bit=src[pos++];bitc=8}v|=(bit&1)<<i;bit>>=1;bitc--}return v}
+    function build(lens){var max=0,i;for(i=0;i<lens.length;i++)if(lens[i]>max)max=lens[i];var cnt=new Array(max+1).fill(0);for(i=0;i<lens.length;i++)if(lens[i])cnt[lens[i]]++;
+      var next=new Array(max+2).fill(0),code=0;for(i=1;i<=max;i++){code=(code+cnt[i-1])<<1;next[i]=code}var map={};
+      for(i=0;i<lens.length;i++){var l=lens[i];if(l){map[l+":"+next[l]]=i;next[l]++}}return{map:map,max:max}}
+    function dec(t){var code=0;for(var l=1;l<=t.max;l++){code=(code<<1)|rb(1);var v=t.map[l+":"+code];if(v!==undefined)return v}throw new Error("bad code")}
+    var LB=[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258],LE=[0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+    var DB=[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577],DE=[0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+    var fl=[],i;for(i=0;i<288;i++)fl[i]=i<144?8:i<256?9:i<280?7:8;var FL=build(fl),fd=[];for(i=0;i<30;i++)fd[i]=5;var FD=build(fd);
+    var last=0;
+    while(!last){last=rb(1);var type=rb(2);
+      if(type===0){bitc=0;var len=src[pos]|(src[pos+1]<<8);pos+=4;for(i=0;i<len;i++)out.push(src[pos++]);continue}
+      var lt,dt;
+      if(type===1){lt=FL;dt=FD}
+      else if(type===2){var hl=rb(5)+257,hd=rb(5)+1,hc=rb(4)+4,ord=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15],cl=new Array(19).fill(0);
+        for(i=0;i<hc;i++)cl[ord[i]]=rb(3);var ct=build(cl),ls=[];
+        while(ls.length<hl+hd){var sym=dec(ct);if(sym<16)ls.push(sym);else if(sym===16){var p=ls[ls.length-1],r=3+rb(2);while(r--)ls.push(p)}else if(sym===17){var r2=3+rb(3);while(r2--)ls.push(0)}else{var r3=11+rb(7);while(r3--)ls.push(0)}}
+        lt=build(ls.slice(0,hl));dt=build(ls.slice(hl))}
+      else throw new Error("bad block");
+      for(;;){var s=dec(lt);if(s<256)out.push(s);else if(s===256)break;else{s-=257;var L=LB[s]+rb(LE[s]),d=dec(dt),D=DB[d]+rb(DE[d]);for(var k=0;k<L;k++)out.push(out[out.length-D])}}
+    }
+    return new Uint8Array(out);
+  }
+  function text(u){return new TextDecoder().decode(u)}
+  function decode(h){
+    if(h[0]==="j")return Promise.resolve(JSON.parse(text(b64(h.slice(1)))));
+    if(h[0]==="z"){var u=b64(h.slice(1));
+      if(window.DecompressionStream){try{return new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text().then(JSON.parse).catch(function(){return JSON.parse(text(inflate(u)))})}catch(e){}}
+      return Promise.resolve(JSON.parse(text(inflate(u))))}
+    /* older Red Zone links: plain base64 JSON {k,h,l} */
+    return Promise.resolve(JSON.parse(text(b64(h))));
+  }
+  function fmtDate(d){if(!d)return"";try{return new Date(d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}catch(e){return d}}
+  var app=document.getElementById("app");
+  function show(D){
+    var G=GROUPS[D.g]||null,root=document.documentElement;
+    if(G){root.style.setProperty("--gc",G.c);root.style.setProperty("--gb",G.b);root.style.setProperty("--gf",G.f)}
+    var kind=D.k||"A",title=KINDS[kind]||D.k||"MAP Intervention";
+    document.title=title+(D.c?" · "+D.c:"")+" · Groups Answers";
+    var meta=[];if(D.c)meta.push("Class "+esc(D.c));if(D.n)meta.push("Session "+esc(D.n));if(D.d)meta.push(esc(fmtDate(D.d)));
+    var h='<header class="head"><div class="eye">Groups Answers'+(G?' · <span class="pill">'+G.k+"</span>":"")+"</div><h1>"+esc(title)+'</h1><div class="meta">'+(D.t?"<span>"+esc(D.t)+"</span>":"")+meta.map(function(x){return"<span>"+x+"</span>"}).join("")+"</div></header>";
+    var L=D.l||[];
+    if(kind==="A"){
+      if(!L.length){app.innerHTML=h+'<div class="msg">The answer key is not ready yet. Ask your teacher.</div>';return}
+      h+='<div class="note">Check each answer with your work. Tap <b>✓ Correct</b> or <b>✗ Wrong</b>. Tap <b>Show how</b> to see the steps.</div>';
+      h+=L.map(function(x,i){var st=x[2]||[];return '<section class="card" data-i="'+i+'"><div class="tt"><span>'+esc(x[0])+'</span></div><div class="ans"><small>Answer</small>'+esc(x[1])+"</div>"+
+        (st.length?'<ol class="how">'+st.map(function(y){return"<li>"+esc(y)+"</li>"}).join("")+"</ol>":"")+
+        '<div class="row">'+(st.length?'<button type="button" data-a="how">Show how</button>':"")+'<button type="button" class="y" data-a="y">✓ Correct</button><button type="button" class="n" data-a="n">✗ Wrong</button></div></section>'}).join("");
+      h+='<div class="score"><span>My score</span><b id="sc">0 / '+L.length+"</b></div>";
+      app.innerHTML=h;
+      var mark={};
+      app.onclick=function(e){var b=e.target.closest("button[data-a]");if(!b)return;var c=b.closest(".card"),i=c.dataset.i,a=b.dataset.a;
+        if(a==="how"){c.classList.toggle("open");b.textContent=c.classList.contains("open")?"Hide steps":"Show how";return}
+        mark[i]=mark[i]===a?null:a;c.classList.toggle("ok",mark[i]==="y");c.classList.toggle("no",mark[i]==="n");
+        c.querySelectorAll("button.y,button.n").forEach(function(x){x.classList.toggle("on",x.dataset.a===mark[i])});
+        var n=0;for(var k in mark)if(mark[k]==="y")n++;document.getElementById("sc").textContent=n+" / "+L.length};
+      return;
+    }
+    if(kind==="E"){h+='<ul class="list bul">'+L.map(function(x){var p=String(x).split(" = "),en=p[0],rest=p.slice(1).join(" = "),ar=rest.split(" : ")[0],m=rest.split(" : ").slice(1).join(" : ");
+      if(!rest){var q=String(x).split(" : ");en=q[0];m=q.slice(1).join(" : ");ar=""}
+      return"<li><b>"+esc(en)+"</b>"+(ar?'<span class="ar">'+esc(ar)+"</span>":"")+(m?"<span>"+esc(m)+"</span>":"")+"</li>"}).join("")+"</ul>"}
+    else h+='<ol class="list '+(kind==="S"?"num":"bul")+'">'+L.map(function(x){return"<li>"+esc(x)+"</li>"}).join("")+"</ol>";
+    app.innerHTML=h;
+  }
+  function legacy(d){return{k:d.k==="A"?"A":({"ELL SUPPORT":"E","STEP BY STEP":"S","FORMULA SHEET":"F"})[d.k]||"S",t:d.h,l:d.k==="A"?[]:(d.l||[]),raw:d}}
+  function render(){
+    var h=location.hash.slice(1);if(!h)return;
+    decode(h).then(function(d){
+      if(d&&d.v===1)show(d);
+      else if(d&&d.l){var L=legacy(d);if(d.k==="A")L.l=(d.l||[]).map(function(x){var m=String(x).match(/^(.*?)\s+✅ Answer:\s*(.*?)(?:\s+—\s+How:\s*(.*))?$/);return m?[m[1],m[2],m[3]?m[3].split(/\s+\d+\.\s+/).filter(Boolean):[]]:[String(x),"",[]]});show(L)}
+      else throw new Error("empty")
+    }).catch(function(){app.innerHTML='<div class="msg">This QR code could not be read. Ask your teacher for a new paper.</div>'});
+  }
+  window.addEventListener("hashchange",render);render();
+})();
+</script>
+</body>
+</html>
